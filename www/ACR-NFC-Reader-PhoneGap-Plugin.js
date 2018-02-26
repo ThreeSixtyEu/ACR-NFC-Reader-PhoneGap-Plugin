@@ -163,6 +163,10 @@ ACR.disconnectReader = function() {
   cordova.exec(function() {}, function() {}, "ACRNFCReaderPhoneGapPlugin", "disconnectReader", []);
 };
 
+ACR.connectUsbReader = function() {
+  cordova.exec(function() {}, function() {}, "ACRNFCReaderPhoneGapPlugin", "connectUsbReader", []);
+};
+
 ACR.writeData = function(block, data, password, success, failure) {
   if (ACR.metadata.type === "javacard"){
     failure({success:false, exception: "javacard"});

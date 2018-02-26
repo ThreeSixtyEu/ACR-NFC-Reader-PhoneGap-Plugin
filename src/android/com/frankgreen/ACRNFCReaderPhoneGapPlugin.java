@@ -24,7 +24,10 @@ import com.frankgreen.params.*;
 import com.frankgreen.reader.ACRReader;
 import com.frankgreen.reader.BTReader;
 import com.frankgreen.reader.USBReader;
+import com.frankgreen.reader.OnDataListener;
 import com.frankgreen.task.StopSessionTimerTask;
+import com.frankgreen.reader.ACRReaderException;
+
 
 import org.apache.cordova.*;
 import org.json.JSONArray;
@@ -63,6 +66,7 @@ public class ACRNFCReaderPhoneGapPlugin extends CordovaPlugin {
     private static final String START_SCAN = "startScan";
     private static final String STOP_SCAN = "stopScan";
     private static final String RECONNECT_READER = "reconnectReader";
+    private static final String CONNECT_USB_READER = "connectUsbReader";
     private static final int REQUEST_ENABLE_BT = 1;
 
     private static boolean isSupportedBlueTooth = true;
@@ -170,6 +174,7 @@ public class ACRNFCReaderPhoneGapPlugin extends CordovaPlugin {
 
 
     private void useUsbReader(CordovaInterface cordova, final CordovaWebView webView) {
+        isSupportedBlueTooth = false;
         usbManager = (UsbManager) cordova.getActivity().getSystemService(Context.USB_SERVICE);
         ACRReader reader = new USBReader(usbManager);
         nfcReader = new NFCReader(reader);
@@ -190,6 +195,110 @@ public class ACRNFCReaderPhoneGapPlugin extends CordovaPlugin {
                     Log.d(TAG, "Card Lost");
                     webView.sendJavascript("ACR.runCardAbsent();");
                 }
+//                }
+            }
+        });
+
+        nfcReader.setOnStatusChangeListener(new ACRReader.StatusChangeListener() {
+
+                                                @Override
+                                                public void onReady(ACRReader reader) {
+                                                    Log.d(TAG, "onReady");
+                                                    initReader(null, null);
+                                                    webView.sendJavascript("ACR.onReady();");
+                                                }
+
+                                                @Override
+                                                public void onAttach(ACRDevice device) {
+                                                    Log.d(TAG, "onAttach");
+                                                    webView.sendJavascript("ACR.onAttach('" + ((UsbDevice) device.getDevice()).getDeviceName() + "');");
+                                                }
+
+                                                @Override
+                                                public void onDetach(ACRDevice device) {
+                                                    Log.d(TAG, "onDetach");
+                                                    webView.sendJavascript("ACR.onDetach('" + ((UsbDevice) device.getDevice()).getDeviceName() + "');");
+                                                }
+                                            }
+        );
+        // Register receiver for USB permission
+
+        mPermissionIntent = PendingIntent.getBroadcast(getActivity(), 0, new Intent(ACTION_USB_PERMISSION), 0);
+        nfcReader.setPermissionIntent(mPermissionIntent);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_USB_PERMISSION);
+        filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        getActivity().registerReceiver(broadcastReceiver, filter);
+        setupTimer();
+        nfcReader.start();
+    }
+
+    public void connectUsbReader() {
+
+        isSupportedBlueTooth = false;
+        usbManager = (UsbManager) this.cordova.getActivity().getSystemService(Context.USB_SERVICE);
+        ACRReader reader = new USBReader(usbManager);
+        nfcReader = new NFCReader(reader);
+        webView = this.webView;
+
+        nfcReader.setOnStateChangeListener(new Reader.OnStateChangeListener() {
+
+            @Override
+            public void onStateChange(int slotNumber, int previousState, int currentState) {
+//                if (!nfcReader.isProcessing()) {
+                Log.d(TAG, "slotNumber " + slotNumber);
+                Log.d(TAG, "previousState " + previousState);
+                Log.d(TAG, "currentState " + currentState);
+
+                if (previousState < Reader.CARD_UNKNOWN
+                        || previousState > Reader.CARD_SPECIFIC) {
+                    previousState = Reader.CARD_UNKNOWN;
+                }
+
+                if (currentState < Reader.CARD_UNKNOWN
+                        || currentState > Reader.CARD_SPECIFIC) {
+                    currentState = Reader.CARD_UNKNOWN;
+                }
+
+                if (slotNumber == 0 && currentState == Reader.CARD_PRESENT) {
+                    Log.d(TAG, "Ready to read!!!!");
+                    //webView.sendJavascript("alert('Ready to read: " + slotNumber + "');");
+
+                    byte[] sendBuffer = new byte[]{(byte) 0xFF, (byte) 0xCA, (byte) 0x0, (byte) 0x0, (byte) 0x0};
+                    nfcReader.getReader().control(slotNumber, sendBuffer, new OnDataListener() {
+                        @Override
+                        public boolean onData(byte[] bytes, int len) {
+                          String outputString = "";
+                          StringBuffer uid = new StringBuffer();
+                          for (int i = 0; i < (len - 2); i++) {
+                              uid.append(String.format("%02X", bytes[i]));
+                              //if (i < len - 3) {
+                              //    uid.append(":");
+                              //}
+                              outputString = uid.toString();
+                          }
+                          //webView.sendJavascript("alert('outputstring: " + outputString + "');");
+
+                          PluginResult result = new PluginResult(PluginResult.Status.OK, outputString.toLowerCase());
+                          result.setKeepCallback(true);
+                          callback.sendPluginResult(result);
+
+                          return true;
+                        }
+                        @Override
+                        public boolean onError(ACRReaderException e) {
+                                                    return true;
+                        }
+                    });
+
+
+
+                                        nfcReader.reset(slotNumber);
+                } else {// if (currentState == Reader.CARD_ABSENT && previousState == Reader.CARD_PRESENT) {
+                   Log.d(TAG, "Card Lost");
+                   //webView.sendJavascript("alert('cart lost');");
+                   webView.sendJavascript("ACR.runCardAbsent();");
+               }
 //                }
             }
         });
@@ -277,6 +386,8 @@ public class ACRNFCReaderPhoneGapPlugin extends CordovaPlugin {
             startScan(callbackContext);
         } else if (action.equalsIgnoreCase(STOP_SCAN)) {
             stopScan(callbackContext);
+        } else if (action.equalsIgnoreCase(CONNECT_USB_READER)) {
+            connectUsbReader();
         } else if (action.equalsIgnoreCase(IS_READY)) {
             if (nfcReader != null && nfcReader.isReady()) {
                 callbackContext.success();
@@ -479,10 +590,12 @@ public class ACRNFCReaderPhoneGapPlugin extends CordovaPlugin {
                 Log.d(TAG, "Success: " + result.isSuccess());
                 Log.d(TAG, "Code: " + result.getCodeString());
                 if (result.getData() != null) {
+                //webView.sendJavascript("alert('result: " + Util.ByteArrayToHexString(result.getData()) + ", Code:" + result.getCodeString() + ", Success: " + result.isSuccess() + ", " + result.isSendPlugin() + "');");
                     Log.d(TAG, "Data: " + Util.ByteArrayToHexString(result.getData()));
                 }
                 Log.d(TAG, "====================");
                 if (callbackContext != null && result.isSendPlugin()) {
+                    //webView.sendJavascript("alert('callback');");
                     PluginResult pluginResult = new PluginResult(
                             result.isSuccess() ? PluginResult.Status.OK : PluginResult.Status.ERROR,
                             Util.resultToJSON(result));
