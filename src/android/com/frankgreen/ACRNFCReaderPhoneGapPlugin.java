@@ -77,6 +77,7 @@ public class ACRNFCReaderPhoneGapPlugin extends CordovaPlugin {
 
 
     private UsbManager usbManager;
+    private CallbackContext callback;
 
     private BluetoothReaderManager bluetoothReaderManager;
     private BluetoothManager mBluetoothManager;
@@ -576,8 +577,10 @@ public class ACRNFCReaderPhoneGapPlugin extends CordovaPlugin {
         }
     }
 
+
     private void listen(final CallbackContext callbackContext) {
         Log.w(TAG, "ACR listen");
+        callback = callbackContext;
         nfcReader.listen(generateResultListener(callbackContext));
     }
 
