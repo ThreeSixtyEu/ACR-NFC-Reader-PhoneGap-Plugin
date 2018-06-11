@@ -47,7 +47,7 @@ public class UID extends Base<BaseParams> implements OnDataListener {
 
     @Override
     public boolean onData(byte[] bytes, int len) {
-        Result result = new Result("UID", len, bytes);
+        Result result = new Result(TAG, len, bytes);
         nfcReader.getChipMeta().setUID(result.getData());
         result.setSendPlugin(this.isSendPlugin());
         if (this.getParams().getOnGetResultListener() != null) {

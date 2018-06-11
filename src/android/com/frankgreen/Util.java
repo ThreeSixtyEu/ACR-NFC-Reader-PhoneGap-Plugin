@@ -190,18 +190,22 @@ public class Util {
                     json.put("response", toHexString(result.getData()));
                 }
 
-                if (result.getCommand() == "Reset") {
-                    json.put("metadata", result.getMeta().toJSON());
-                }
+                // if (result.getCommand() == "Reset") {
+                //     json.put("metadata", result.getMeta().toJSON());
+                // }
                 json.put("data", result.getDataString());
             }
+            if (result.getMeta() != null) {
+                json.put("metadata", result.getMeta().toJSON());
+            }
             json.put("success", result.isSuccess());
+            json.put("command", result.getCommand());
             if (result.getException() != null) {
                 json.put("exception", result.getException().getMessage());
             }
             if (result.getCommand() == "Disconnect") {
                 json.put("data", result.getResultMessage());
-            }
+            }            
         } catch (JSONException e) {
             try {
                 json.put("exception", e.getMessage());
