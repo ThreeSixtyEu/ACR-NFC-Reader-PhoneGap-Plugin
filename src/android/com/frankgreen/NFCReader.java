@@ -8,6 +8,8 @@ import android.util.Log;
 import com.acs.smartcard.*;
 import com.frankgreen.apdu.OnGetResultListener;
 import com.frankgreen.apdu.Result;
+import com.frankgreen.apdu.command.Beep;
+import com.frankgreen.params.BaseParams;
 import com.frankgreen.reader.ACRReader;
 import com.frankgreen.task.*;
 
