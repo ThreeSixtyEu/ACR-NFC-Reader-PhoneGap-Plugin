@@ -505,6 +505,7 @@ public class ACRNFCReaderPhoneGapPlugin extends CordovaPlugin {
                             Util.resultToJSON(result));
                     pluginResult.setKeepCallback(true);
                     callbackContext.sendPluginResult(pluginResult);
+                    nfcReader.softReset(0);
                 }
             }
         };

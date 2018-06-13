@@ -212,6 +212,14 @@ public class NFCReader {
         new ResetTask().execute(baseParams);
     }
 
+    public synchronized void softReset(int slotNumber) {
+        this.chipMeta = new ChipMeta();
+        BaseParams baseParams = new BaseParams(slotNumber);
+        baseParams.setReader(this);
+        baseParams.setOnGetResultListener(acrReader.getOnTouchListener());
+        new SoftResetTask().execute(baseParams);
+    }
+
     public boolean isProcessing() {
         return processing;
     }
