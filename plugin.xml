@@ -51,6 +51,7 @@
     <source-file src="src/android/com/frankgreen/apdu/command/GetLedStatus.java" target-dir="src/com/frankgreen/apdu/command" />
     <source-file src="src/android/com/frankgreen/apdu/command/AutoStartPolling.java" target-dir="src/com/frankgreen/apdu/command" />
     <source-file src="src/android/com/frankgreen/apdu/command/BuzzerOff.java" target-dir="src/com/frankgreen/apdu/command" />
+    <source-file src="src/android/com/frankgreen/apdu/command/BacklightOn.java" target-dir="src/com/frankgreen/apdu/command" />
     <source-file src="src/android/com/frankgreen/apdu/command/Beep.java" target-dir="src/com/frankgreen/apdu/command" />
 
     <!--params-->
