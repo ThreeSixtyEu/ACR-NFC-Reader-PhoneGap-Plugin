@@ -66,7 +66,6 @@ public class ACRNFCReaderPhoneGapPlugin extends CordovaPlugin {
     private static final String START_SCAN = "startScan";
     private static final String STOP_SCAN = "stopScan";
     private static final String RECONNECT_READER = "reconnectReader";
-    private static final String CONNECT_USB_READER = "connectUsbReader";
     private static final int REQUEST_ENABLE_BT = 1;
 
     private static boolean isSupportedBlueTooth = false;
@@ -289,8 +288,6 @@ public class ACRNFCReaderPhoneGapPlugin extends CordovaPlugin {
             startScan(callbackContext);
         } else if (action.equalsIgnoreCase(STOP_SCAN)) {
             stopScan(callbackContext);
-        } else if (action.equalsIgnoreCase(CONNECT_USB_READER)) {
-            connectUsbReader(callbackContext);
         } else if (action.equalsIgnoreCase(IS_READY)) {
             if (nfcReader != null && nfcReader.isReady()) {
                 callbackContext.success();
