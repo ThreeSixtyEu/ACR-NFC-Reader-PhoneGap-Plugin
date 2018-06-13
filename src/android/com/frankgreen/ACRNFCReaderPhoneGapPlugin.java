@@ -184,68 +184,6 @@ public class ACRNFCReaderPhoneGapPlugin extends CordovaPlugin {
         ACRReader reader = new USBReader(usbManager);
         nfcReader = new NFCReader(reader);
 
-//         nfcReader.setOnStateChangeListener(new Reader.OnStateChangeListener() {
-
-//             @Override
-//             public void onStateChange(int slotNumber, int previousState, int currentState) {
-// //                if (!nfcReader.isProcessing()) {
-//                 Log.d(TAG, "slotNumber " + slotNumber);
-//                 Log.d(TAG, "previousState " + previousState);
-//                 Log.d(TAG, "currentState " + currentState);
-
-//                 if (previousState < Reader.CARD_UNKNOWN
-//                         || previousState > Reader.CARD_SPECIFIC) {
-//                     previousState = Reader.CARD_UNKNOWN;
-//                 }
-
-//                 if (currentState < Reader.CARD_UNKNOWN
-//                         || currentState > Reader.CARD_SPECIFIC) {
-//                     currentState = Reader.CARD_UNKNOWN;
-//                 }
-
-//                 if (slotNumber == 0 && currentState == Reader.CARD_PRESENT) {
-//                     Log.d(TAG, "Ready to read!!!!");
-//                     //webView.sendJavascript("alert('Ready to read: " + slotNumber + "');");
-
-//                     byte[] sendBuffer = new byte[]{(byte) 0xFF, (byte) 0xCA, (byte) 0x0, (byte) 0x0, (byte) 0x0};
-//                     nfcReader.getReader().control(slotNumber, sendBuffer, new OnDataListener() {
-//                         @Override
-//                         public boolean onData(byte[] bytes, int len) {
-//                           String outputString = "";
-//                           StringBuffer uid = new StringBuffer();
-//                           for (int i = 0; i < (len - 2); i++) {
-//                               uid.append(String.format("%02X", bytes[i]));
-//                               //if (i < len - 3) {
-//                               //    uid.append(":");
-//                               //}
-//                               outputString = uid.toString();
-//                           }
-//                           //webView.sendJavascript("alert('outputstring: " + outputString + "');");
-
-//                           PluginResult result = new PluginResult(PluginResult.Status.OK, outputString.toLowerCase());
-//                           result.setKeepCallback(true);
-//                           callback.sendPluginResult(result);
-
-//                           return true;
-//                         }
-//                         @Override
-//                         public boolean onError(ACRReaderException e) {
-//                                                     return true;
-//                         }
-//                     });
-
-
-
-//                                         nfcReader.reset(slotNumber);
-//                 } else {// if (currentState == Reader.CARD_ABSENT && previousState == Reader.CARD_PRESENT) {
-//                    Log.d(TAG, "Card Lost");
-//                    //webView.sendJavascript("alert('cart lost');");
-//                    webView.sendJavascript("ACR.runCardAbsent();");
-//                }
-// //                }
-//             }
-//         });
-
         nfcReader.setOnStateChangeListener(new Reader.OnStateChangeListener() {
 
             @Override
@@ -300,10 +238,6 @@ public class ACRNFCReaderPhoneGapPlugin extends CordovaPlugin {
         getActivity().registerReceiver(broadcastReceiver, filter);
         setupTimer();
         nfcReader.start();
-    }
-
-    public void connectUsbReader(final CallbackContext callbackContext) {
-        
     }
 
     @Override
