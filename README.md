@@ -11,8 +11,7 @@ plugman platform add --platform_name android
 
 ### install to project
 ```bash
-git clone git@github.com:MorningCoffeeDev/ACR-NFC-Reader-PhoneGap-Plugin.git
-cordova plugin add ../ACR-NFC-Reader-PhoneGap-Plugin/
+cordova plugin add https://github.com/ThreeSixtyEu/ACR-NFC-Reader-PhoneGap-Plugin.git
 ```
 
 ### Usage
