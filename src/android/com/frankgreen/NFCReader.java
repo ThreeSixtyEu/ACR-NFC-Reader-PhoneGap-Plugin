@@ -8,7 +8,6 @@ import android.util.Log;
 import com.acs.smartcard.*;
 import com.frankgreen.apdu.OnGetResultListener;
 import com.frankgreen.apdu.Result;
-import com.frankgreen.apdu.command.Beep;
 import com.frankgreen.params.BaseParams;
 import com.frankgreen.reader.ACRReader;
 import com.frankgreen.task.*;
@@ -116,11 +115,6 @@ public class NFCReader {
     public void getVersion(BaseParams baseParams) {
         baseParams.setReader(this);
         new GetVersionTask().execute(baseParams);
-    }
-    
-    public void beep(BaseParams baseParams) {
-        baseParams.setReader(this);
-        new Beep(baseParams).run();
     }
 
     public void getBatteryLevel(BaseParams baseParams) {
