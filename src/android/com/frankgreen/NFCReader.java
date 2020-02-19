@@ -117,6 +117,11 @@ public class NFCReader {
         baseParams.setReader(this);
         new GetVersionTask().execute(baseParams);
     }
+    
+    public void beep(BaseParams baseParams) {
+        baseParams.setReader(this);
+        new Beep(baseParams).run();
+    }
 
     public void getBatteryLevel(BaseParams baseParams) {
         baseParams.setReader(this);
