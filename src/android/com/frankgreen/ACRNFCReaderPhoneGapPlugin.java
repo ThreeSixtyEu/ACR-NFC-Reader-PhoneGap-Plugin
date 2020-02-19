@@ -20,6 +20,7 @@ import com.acs.bluetooth.*;
 import com.acs.smartcard.Reader;
 import com.frankgreen.apdu.OnGetResultListener;
 import com.frankgreen.apdu.Result;
+import com.frankgreen.apdu.command.Beep;
 import com.frankgreen.params.*;
 import com.frankgreen.reader.ACRReader;
 import com.frankgreen.reader.BTReader;
@@ -508,7 +509,9 @@ public class ACRNFCReaderPhoneGapPlugin extends CordovaPlugin {
 
                     if (result.getCommand() == "UID") {
                         nfcReader.softReset(0);
-                        nfcReader.beep();
+                        BaseParams baseParams = new BaseParams(0);
+                        final Beep beep = new Beep(baseParams);
+                        beep.run();
                     }
                     
                 }
